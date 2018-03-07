@@ -1,18 +1,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.urlresolvers import reverse_lazy
-from django.http import HttpResponse
 from .forms import PessoaForm, UserForm, UserWithoutPasswordForm
 from pessoa.models import Pessoa
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import DeleteView
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 
+
 @login_required
 def pessoaUpdate(request, pk):
-    pessoa = get_object_or_404(Pessoa,pk=pk)
+    pessoa = get_object_or_404(Pessoa, pk=pk)
     if request.method == 'POST':
         form = PessoaForm(request.POST, instance=pessoa)
         context = {
@@ -20,7 +20,7 @@ def pessoaUpdate(request, pk):
             'objeto': 'Pessoa',
         }
         if form.is_valid():
-            p1 = form.save()
+            form.save()
             return redirect('pessoa:home')
         else:
             return render(request, 'form.html', context)
@@ -38,13 +38,15 @@ class DeletePessoa(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('pessoa:home')
     template_name = 'confirmdelete.html'
 
+
 @login_required
 def pessoahome(request):
     pessoas = Pessoa.objects.all()
     context = {
-        'pessoas' : pessoas
+        'pessoas': pessoas
     }
     return render(request, 'pessoa/pessoahome.html', context)
+
 
 @login_required
 def pessoacreate(request):
@@ -55,7 +57,7 @@ def pessoacreate(request):
             'objeto': 'Pessoa',
         }
         if form.is_valid():
-            p1 = form.save()
+            form.save()
             return redirect('pessoa:home')
         else:
             return render(request, 'form.html', context)
@@ -67,13 +69,15 @@ def pessoacreate(request):
         }
         return render(request, 'form.html', context)
 
+
 @login_required
 def listUsers(request):
     users = User.objects.all()
     context = {
-        'users':users,
+        'users': users,
     }
     return render(request, 'pessoa/users.html', context)
+
 
 @login_required
 def createUser(request):
@@ -99,9 +103,10 @@ def createUser(request):
         }
         return render(request, 'form.html', context)
 
+
 @login_required
-def updateUser(request,pk):
-    usuario = get_object_or_404(User,pk=pk)
+def updateUser(request, pk):
+    usuario = get_object_or_404(User, pk=pk)
     if request.method == 'POST':
         form = UserWithoutPasswordForm(request.POST, instance=usuario)
         context = {
@@ -109,7 +114,7 @@ def updateUser(request,pk):
             'objeto': 'User',
         }
         if form.is_valid():
-            user = form.save()
+            form.save()
             return redirect('pessoa:listUsers')
         else:
             return render(request, 'form.html', context)
@@ -121,10 +126,12 @@ def updateUser(request,pk):
         }
         return render(request, 'form.html', context)
 
+
 class DeleteUser(LoginRequiredMixin, DeleteView):
     model = User
     success_url = reverse_lazy('pessoa:listUsers')
     template_name = 'confirmdelete.html'
+
 
 @login_required
 def change_password(request):
